@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.expo/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+
+# Obsidian workspace state (개인 설정은 커밋하지 않음)
+docs/.obsidian/workspace.json
+docs/.obsidian/workspace-mobile.json

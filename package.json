@@ -1,0 +1,18 @@
+{
+  "name": "chatmu",
+  "private": true,
+  "version": "0.1.0",
+  "description": "업무시간에 친구들끼리 지금 듣는 노래를 실시간으로 공유하는 소셜 음악 서비스",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "worker:dev": "npm run dev --workspace apps/worker",
+    "mobile:start": "npm run start --workspace apps/mobile"
+  },
+  "devDependencies": {
+    "typescript": "~5.5.4"
+  }
+}

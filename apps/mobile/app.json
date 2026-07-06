@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "chatMu",
+    "slug": "chatmu",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "chatmu",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "com.chatmu.app",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.chatmu.app"
+    },
+    "plugins": ["expo-dev-client"]
+  }
+}
