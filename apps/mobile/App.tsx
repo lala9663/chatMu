@@ -1,15 +1,46 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { Session } from "@supabase/supabase-js";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { ensureProfile } from "./src/lib/auth";
+import { supabase } from "./src/lib/supabase";
+import { LoginScreen } from "./src/screens/LoginScreen";
+import { RoomFeedScreen } from "./src/screens/RoomFeedScreen";
+import { RoomsScreen } from "./src/screens/RoomsScreen";
+import { useNavStore } from "./src/stores/navStore";
 
 const queryClient = new QueryClient();
 
 export default function App() {
+  const [session, setSession] = useState<Session | null>(null);
+  const screen = useNavStore((s) => s.screen);
+  const navigate = useNavStore((s) => s.navigate);
+
+  useEffect(() => {
+    void supabase.auth.getSession().then(({ data }) => setSession(data.session));
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+      if (newSession) {
+        void ensureProfile();
+      } else {
+        navigate({ name: "rooms" }); // 로그아웃 시 초기 화면으로
+      }
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <View style={styles.container}>
-        <Text style={styles.title}>chatMu</Text>
-        <Text style={styles.subtitle}>지금 듣는 노래, 조용히 같이 듣기</Text>
+        {!session ? (
+          <LoginScreen />
+        ) : screen.name === "roomFeed" ? (
+          <RoomFeedScreen roomId={screen.roomId} roomName={screen.roomName} />
+        ) : (
+          <RoomsScreen />
+        )}
         <StatusBar style="auto" />
       </View>
     </QueryClientProvider>
@@ -17,18 +48,5 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-  },
-  subtitle: {
-    fontSize: 14,
-    opacity: 0.6,
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
 });
