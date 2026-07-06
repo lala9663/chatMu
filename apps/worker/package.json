@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@chatmu/shared": "*",
-    "@supabase/supabase-js": "^2.45.0"
+    "@supabase/supabase-js": "2.45.4"
   },
   "devDependencies": {
     "tsx": "^4.19.0",

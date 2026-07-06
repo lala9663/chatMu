@@ -1,3 +1,4 @@
+import { demoRooms, isDemo } from "../lib/demo";
 import { supabase } from "../lib/supabase";
 
 export interface RoomSummary {
@@ -7,6 +8,7 @@ export interface RoomSummary {
 }
 
 export async function fetchMyRooms(): Promise<RoomSummary[]> {
+  if (isDemo) return demoRooms;
   const { data, error } = await supabase.from("rooms").select("id, name, code");
   if (error) throw error;
   return data;
@@ -14,6 +16,11 @@ export async function fetchMyRooms(): Promise<RoomSummary[]> {
 
 /** 방 생성 + 본인 멤버 등록. 6자리 코드 자동 발급 */
 export async function createRoom(name: string): Promise<RoomSummary> {
+  if (isDemo) {
+    const room = { id: `room-${Date.now()}`, name, code: generateRoomCode() };
+    demoRooms.push(room);
+    return room;
+  }
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("로그인이 필요합니다");
 
@@ -35,6 +42,11 @@ export async function createRoom(name: string): Promise<RoomSummary> {
 
 /** 방 코드로 입장 — 코드 검증은 join-room Edge Function (RLS상 비멤버는 rooms를 못 읽으므로) */
 export async function joinRoomByCode(code: string): Promise<{ room_id: string; name: string }> {
+  if (isDemo) {
+    const room = demoRooms.find((r) => r.code === code.trim().toUpperCase());
+    if (!room) throw new Error("room not found");
+    return { room_id: room.id, name: room.name };
+  }
   const { data, error } = await supabase.functions.invoke("join-room", {
     body: { code: code.trim().toUpperCase() },
   });

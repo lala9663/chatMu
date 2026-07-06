@@ -10,7 +10,8 @@
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "worker:dev": "npm run dev --workspace apps/worker",
-    "mobile:start": "npm run start --workspace apps/mobile"
+    "mobile:start": "npm run start --workspace apps/mobile",
+    "mobile:web": "npm run web --workspace apps/mobile"
   },
   "devDependencies": {
     "typescript": "~5.5.4"

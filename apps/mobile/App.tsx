@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { ensureProfile } from "./src/lib/auth";
+import { isDemo } from "./src/lib/demo";
 import { supabase } from "./src/lib/supabase";
 import { LoginScreen } from "./src/screens/LoginScreen";
 import { RoomFeedScreen } from "./src/screens/RoomFeedScreen";
@@ -18,6 +19,7 @@ export default function App() {
   const navigate = useNavStore((s) => s.navigate);
 
   useEffect(() => {
+    if (isDemo) return; // 데모 모드: 인증 생략
     void supabase.auth.getSession().then(({ data }) => setSession(data.session));
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
@@ -34,7 +36,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <View style={styles.container}>
-        {!session ? (
+        {!session && !isDemo ? (
           <LoginScreen />
         ) : screen.name === "roomFeed" ? (
           <RoomFeedScreen roomId={screen.roomId} roomName={screen.roomName} />

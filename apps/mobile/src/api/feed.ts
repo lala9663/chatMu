@@ -1,4 +1,5 @@
 import type { RealtimeChannel } from "@supabase/supabase-js";
+import { demoFeed, demoMessages, demoReactions, isDemo } from "../lib/demo";
 import { supabase } from "../lib/supabase";
 
 export interface FeedItem {
@@ -22,6 +23,7 @@ export interface RoomMessage {
 }
 
 export async function fetchFeed(roomId: string): Promise<FeedItem[]> {
+  if (isDemo) return demoFeed;
   // 1. 방 멤버
   const { data: members, error: membersError } = await supabase
     .from("room_members")
@@ -73,6 +75,7 @@ export async function fetchFeed(roomId: string): Promise<FeedItem[]> {
 }
 
 export async function fetchMessages(roomId: string, limit = 50): Promise<RoomMessage[]> {
+  if (isDemo) return demoMessages;
   const { data, error } = await supabase
     .from("messages")
     .select("id, play_id, user_id, body, created_at, users(nickname)")
@@ -94,6 +97,17 @@ export async function fetchMessages(roomId: string, limit = 50): Promise<RoomMes
 }
 
 export async function sendMessage(roomId: string, playId: string, body: string): Promise<void> {
+  if (isDemo) {
+    demoMessages.push({
+      id: `m-${Date.now()}`,
+      playId,
+      userId: "me",
+      nickname: "나",
+      body,
+      createdAt: new Date().toISOString(),
+    });
+    return;
+  }
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("로그인이 필요합니다");
 
@@ -105,6 +119,13 @@ export async function sendMessage(roomId: string, playId: string, body: string):
 
 /** 이모지 반응 토글: 이미 있으면 삭제, 없으면 추가 */
 export async function toggleReaction(playId: string, emoji: string): Promise<void> {
+  if (isDemo) {
+    const list = (demoReactions[playId] ??= []);
+    const entry = list.find((r) => r.emoji === emoji);
+    if (entry) entry.count += 1;
+    else list.push({ emoji, count: 1 });
+    return;
+  }
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("로그인이 필요합니다");
 
@@ -130,6 +151,7 @@ export async function toggleReaction(playId: string, emoji: string): Promise<voi
 export async function fetchReactions(
   playIds: string[],
 ): Promise<Record<string, { emoji: string; count: number }[]>> {
+  if (isDemo) return { ...demoReactions };
   if (playIds.length === 0) return {};
   const { data, error } = await supabase
     .from("reactions")
@@ -152,6 +174,8 @@ export async function fetchReactions(
 
 /** 피드 관련 테이블 변경 구독. 반환된 channel은 화면 unmount 시 removeChannel로 해제 */
 export function subscribeFeed(roomId: string, onChange: () => void): RealtimeChannel {
+  // 데모 모드: 웹소켓 연결 없이 채널 객체만 반환 (removeChannel 호환)
+  if (isDemo) return supabase.channel(`demo-${roomId}`);
   return supabase
     .channel(`room-feed-${roomId}`)
     .on("postgres_changes", { event: "*", schema: "public", table: "now_playing" }, onChange)
