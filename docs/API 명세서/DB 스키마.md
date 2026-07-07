@@ -120,7 +120,8 @@ updated: 2026-07-06
 | 테이블 | read | write |
 |---|---|---|
 | users | 같은 방 멤버 | 본인만 (refresh token 컬럼은 서비스 롤 전용) |
-| rooms / room_members | 멤버만 | 생성자/본인 입장 |
+| rooms | 멤버 또는 생성자 | 생성자 |
+| room_members | 같은 방 멤버 | 방 생성자 본인 등록만 직접 insert 가능. 코드 입장은 join-room Edge Function(서비스 롤) 경유 |
 | now_playing / plays | 같은 방 멤버 + `is_hidden=false` + 대상 유저가 공유 중일 때만 | 서비스 롤(워커) 또는 본인 |
 | reactions / messages | 같은 방 멤버 | 본인 |
 | recommendations | 보낸/받은 사람 | 보낸 사람 |

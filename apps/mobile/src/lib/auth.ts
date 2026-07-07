@@ -4,11 +4,25 @@
  */
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
+import { Platform } from "react-native";
 import { supabase } from "./supabase";
 
 WebBrowser.maybeCompleteAuthSession();
 
+// 주의: Supabase는 카카오에 항상 account_email scope를 요청한다 (클라이언트에서 제거 불가).
+// 따라서 카카오 앱은 비즈 앱(개인 개발자 가능) + 이메일 동의항목 설정이 필수다.
+
 export async function signInWithKakao(): Promise<void> {
+  // 웹: 전체 페이지 리다이렉트 방식 (돌아오면 detectSessionInUrl이 세션 처리)
+  if (Platform.OS === "web") {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+      options: { redirectTo: Linking.createURL("") }, // http://localhost:8081
+    });
+    if (error) throw error;
+    return;
+  }
+
   const redirectTo = Linking.createURL("auth/callback"); // chatmu://auth/callback
 
   const { data, error } = await supabase.auth.signInWithOAuth({
