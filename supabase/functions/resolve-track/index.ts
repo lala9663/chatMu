@@ -1,6 +1,6 @@
 // Odesli로 곡의 전 플랫폼 링크를 확보하고 tracks/track_links에 캐싱.
 // 캐시 히트 우선 (Odesli 무료 티어 rate limit). 실패 시 원본 링크만으로 track 생성.
-import { adminClient, getCaller, json } from "../_shared/admin.ts";
+import { adminClient, getCaller, handleOptions, json } from "../_shared/admin.ts";
 
 interface ResolveRequest {
   platform: string;
@@ -11,6 +11,9 @@ interface ResolveRequest {
 }
 
 Deno.serve(async (req) => {
+  const preflight = handleOptions(req);
+  if (preflight) return preflight;
+
   const caller = await getCaller(req);
   if (!caller) return json({ error: "unauthorized" }, 401);
 

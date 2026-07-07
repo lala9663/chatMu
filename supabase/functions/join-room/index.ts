@@ -1,7 +1,10 @@
 // 방 코드 검증 후 입장. 코드가 맞으면 room_members insert (idempotent).
-import { adminClient, getCaller, json } from "../_shared/admin.ts";
+import { adminClient, getCaller, handleOptions, json } from "../_shared/admin.ts";
 
 Deno.serve(async (req) => {
+  const preflight = handleOptions(req);
+  if (preflight) return preflight;
+
   const caller = await getCaller(req);
   if (!caller) return json({ error: "unauthorized" }, 401);
 

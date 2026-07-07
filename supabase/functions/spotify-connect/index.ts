@@ -1,8 +1,11 @@
 // Spotify OAuth code를 token으로 교환하고 refresh token을 저장.
 // client secret은 함수 환경변수에만 존재 — 클라이언트 번들 노출 금지 원칙.
-import { adminClient, getCaller, json } from "../_shared/admin.ts";
+import { adminClient, getCaller, handleOptions, json } from "../_shared/admin.ts";
 
 Deno.serve(async (req) => {
+  const preflight = handleOptions(req);
+  if (preflight) return preflight;
+
   const caller = await getCaller(req);
   if (!caller) return json({ error: "unauthorized" }, 401);
 

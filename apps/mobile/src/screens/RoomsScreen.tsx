@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { createRoom, fetchMyRooms, joinRoomByCode } from "../api/rooms";
 import { signOut } from "../lib/auth";
+import { fetchSpotifyConnected, startSpotifyConnect } from "../lib/spotifyConnect";
 import { useNavStore } from "../stores/navStore";
 
 export function RoomsScreen() {
@@ -20,6 +21,7 @@ export function RoomsScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const rooms = useQuery({ queryKey: ["rooms"], queryFn: fetchMyRooms });
+  const spotify = useQuery({ queryKey: ["spotifyStatus"], queryFn: fetchSpotifyConnected });
 
   const create = useMutation({
     mutationFn: createRoom,
@@ -49,6 +51,20 @@ export function RoomsScreen() {
           <Text style={styles.signOut}>로그아웃</Text>
         </Pressable>
       </View>
+
+      {spotify.data === false && (
+        <Pressable
+          style={styles.spotifyBanner}
+          onPress={() => startSpotifyConnect().catch((e) => setError(e.message))}
+        >
+          <Text style={styles.spotifyBannerText}>
+            🎧 Spotify 연동하고 내가 듣는 곡 공유하기
+          </Text>
+        </Pressable>
+      )}
+      {spotify.data === true && (
+        <Text style={styles.spotifyConnected}>🎧 Spotify 연동됨 — 재생하면 자동으로 공유돼요</Text>
+      )}
 
       <FlatList
         data={rooms.data ?? []}
@@ -113,6 +129,14 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
   title: { fontSize: 24, fontWeight: "700" },
   signOut: { fontSize: 13, opacity: 0.5 },
+  spotifyBanner: {
+    backgroundColor: "#1DB954",
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 12,
+  },
+  spotifyBannerText: { color: "#fff", fontWeight: "600", textAlign: "center" },
+  spotifyConnected: { fontSize: 12, opacity: 0.5, marginBottom: 12, textAlign: "center" },
   roomCard: {
     padding: 16,
     borderRadius: 12,

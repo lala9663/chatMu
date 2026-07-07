@@ -1,8 +1,11 @@
 // 곡 추천 수신자에게 Expo Push 발송.
 // "직접 추천"이 유일한 알림 예외 — 다른 이벤트에 이 함수를 재사용하지 말 것 (조용한 존재감 원칙).
-import { adminClient, json } from "../_shared/admin.ts";
+import { adminClient, handleOptions, json } from "../_shared/admin.ts";
 
 Deno.serve(async (req) => {
+  const preflight = handleOptions(req);
+  if (preflight) return preflight;
+
   // DB webhook 또는 서비스 롤 호출 전용
   const secret = req.headers.get("x-function-secret");
   if (secret !== Deno.env.get("PUSH_FUNCTION_SECRET")) return json({ error: "forbidden" }, 403);
