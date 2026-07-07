@@ -14,6 +14,15 @@ import { useNavStore } from "./src/stores/navStore";
 
 const queryClient = new QueryClient();
 
+// 웹 전용: Spotify redirect URI가 127.0.0.1 기준이라 localhost 접속을 127.0.0.1로 통일
+// (Spotify 2025 정책상 localhost 등록 불가 → origin이 다르면 redirect_uri 불일치 에러)
+if (Platform.OS === "web") {
+  const loc = (globalThis as { location?: { hostname: string; href: string; replace(u: string): void } }).location;
+  if (loc?.hostname === "localhost") {
+    loc.replace(loc.href.replace("//localhost", "//127.0.0.1"));
+  }
+}
+
 /** 웹 전용: Spotify OAuth 콜백으로 돌아온 경우 URL에서 code를 회수하고 주소를 원복 */
 function consumeSpotifyCodeFromUrl(): string | null {
   if (Platform.OS !== "web") return null;
