@@ -15,6 +15,7 @@ const tokenCache = new Map<string, { accessToken: string; expiresAt: number }>()
 
 async function pollOnce(): Promise<void> {
   const users = await getSpotifyConnectedUsers();
+  console.log(`[poll] Spotify 연동 유저 ${users.length}명`);
 
   for (const user of users) {
     // 잠수 모드 크리티컬 규칙: 폴링 자체를 스킵한다 (조회조차 하지 않음)
@@ -34,6 +35,9 @@ async function pollOnce(): Promise<void> {
       const playing = await fetchCurrentlyPlaying(cached.accessToken);
       if (playing) {
         await upsertNowPlaying(user.id, playing);
+        console.log(`[poll] user=${user.id.slice(0, 8)} ♪ ${playing.title} — ${playing.artist} (playing=${playing.isPlaying})`);
+      } else {
+        console.log(`[poll] user=${user.id.slice(0, 8)} 재생 중 아님`);
       }
     } catch (err) {
       // 유저 하나의 실패가 전체 폴링을 멈추지 않게 한다

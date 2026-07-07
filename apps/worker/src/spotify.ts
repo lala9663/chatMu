@@ -39,7 +39,10 @@ export async function fetchCurrentlyPlaying(accessToken: string): Promise<Spotif
   });
 
   if (res.status === 204) return null; // 재생 중 아님
-  if (!res.ok) throw new Error(`currently-playing failed: ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`currently-playing failed: ${res.status} ${body.slice(0, 200)}`);
+  }
 
   const json = (await res.json()) as {
     is_playing: boolean;
