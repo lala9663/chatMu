@@ -12,10 +12,12 @@ updated: 2026-07-06
 
 | 함수 | 상태 | 용도 |
 |---|---|---|
-| `spotify-connect` | 구현됨 (배포 대기) | Spotify OAuth 콜백 — code를 token으로 교환, refresh token 저장 |
-| `join-room` | 구현됨 (배포 대기) | 방 코드 검증 후 room_members insert |
-| `resolve-track` | 구현됨 (배포 대기) | Odesli 조회 + tracks/track_links 캐싱 (rate limit 게이트) |
-| `send-recommendation-push` | 구현됨 (배포 대기) | 추천 수신자에게 Expo Push 발송 (`x-function-secret` 헤더 인증) |
+| `spotify-connect` | 배포됨 (Spotify 시크릿 미설정) | Spotify OAuth 콜백 — code를 token으로 교환, refresh token 저장 |
+| `join-room` | 배포됨 | 방 코드 검증 후 room_members insert |
+| `resolve-track` | 배포됨 | Odesli 조회 + tracks/track_links 캐싱 (rate limit 게이트) |
+| `send-recommendation-push` | 배포됨 | 추천 수신자에게 Expo Push 발송 (`x-function-secret` 헤더 인증) |
+
+배포 프로젝트: `omphuvughzdtjtonshms` (Seoul) — `https://omphuvughzdtjtonshms.supabase.co/functions/v1/<함수명>`
 
 ---
 
