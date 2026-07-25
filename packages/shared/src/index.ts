@@ -101,3 +101,41 @@ export interface Recommendation {
   listenedAt: string | null;
   createdAt: string;
 }
+
+/**
+ * Android 네이티브 감지 모듈이 JS로 넘기는 재생 이벤트.
+ * 최소 표면적: 감지된 곡 메타데이터 + 재생상태만. 업로드/비즈 로직은 JS/Edge Function에서.
+ */
+export interface DetectedTrack {
+  /** 감지된 앱 패키지 (예: com.iloen.melon) */
+  packageName: string;
+  /** 패키지에서 매핑된 플랫폼 */
+  platform: Platform;
+  title: string;
+  artist: string;
+  album: string | null;
+  /** content:// 또는 http URI. Bitmap은 이번 범위 제외라 없으면 null */
+  artworkUrl: string | null;
+  isPlaying: boolean;
+  /** 감지 시각 (ISO) */
+  detectedAt: string;
+}
+
+/** report-play Edge Function 요청 본문 */
+export interface ReportPlayRequest {
+  platform: Platform;
+  title: string;
+  artist: string;
+  album: string | null;
+  artworkUrl: string | null;
+  isPlaying: boolean;
+}
+
+/**
+ * Android 감지 곡은 Spotify와 달리 안정적 external_id가 없다.
+ * 제목/아티스트를 정규화해 합성키를 만들어 track_links dedup에 쓴다.
+ * ⚠️ report-play Edge Function(Deno)은 이 함수를 import할 수 없어 동일 로직을 인라인 복제한다 — 바꾸면 양쪽 다 고칠 것.
+ */
+export function detectedTrackKey(title: string, artist: string): string {
+  return `${title.trim().toLowerCase()}|${artist.trim().toLowerCase()}`;
+}

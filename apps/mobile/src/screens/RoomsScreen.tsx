@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { createRoom, fetchMyRooms, joinRoomByCode } from "../api/rooms";
+import { DetectionBanner } from "../components/DetectionBanner";
 import { signOut } from "../lib/auth";
 import { fetchSpotifyConnected, startSpotifyConnect } from "../lib/spotifyConnect";
 import { useNavStore } from "../stores/navStore";
@@ -51,6 +52,8 @@ export function RoomsScreen() {
           <Text style={styles.signOut}>로그아웃</Text>
         </Pressable>
       </View>
+
+      <DetectionBanner />
 
       {spotify.data === false && (
         <Pressable

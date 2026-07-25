@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
+import { useMediaDetectionAutostart } from "./src/hooks/useMediaDetectionAutostart";
 import { ensureProfile } from "./src/lib/auth";
 import { isDemo } from "./src/lib/demo";
 import { completeSpotifyConnect } from "./src/lib/spotifyConnect";
@@ -41,6 +42,9 @@ export default function App() {
   const [spotifyCode, setSpotifyCode] = useState<string | null>(consumeSpotifyCodeFromUrl);
   const screen = useNavStore((s) => s.screen);
   const navigate = useNavStore((s) => s.navigate);
+
+  // Android + 로그인 시 재생 감지 자동 시작 (권한 허용된 경우)
+  useMediaDetectionAutostart(Boolean(session) && !isDemo);
 
   // 세션이 준비된 뒤에 Spotify code 교환 (함수 호출에 로그인 토큰 필요)
   useEffect(() => {

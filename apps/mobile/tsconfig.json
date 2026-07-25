@@ -5,5 +5,5 @@
     "lib": ["es2022"],
     "types": []
   },
-  "include": ["index.ts", "App.tsx", "src"]
+  "include": ["index.ts", "App.tsx", "src", "modules"]
 }
