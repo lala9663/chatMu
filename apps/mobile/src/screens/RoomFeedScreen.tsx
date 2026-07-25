@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -18,6 +19,8 @@ import {
   subscribeFeed,
   toggleReaction,
 } from "../api/feed";
+import { fetchMyPreferredPlatform } from "../api/profile";
+import { openTrack } from "../lib/openTrack";
 import { supabase } from "../lib/supabase";
 import { useNavStore } from "../stores/navStore";
 import { NowPlayingCard } from "../components/NowPlayingCard";
@@ -45,6 +48,17 @@ export function RoomFeedScreen({ roomId, roomName }: Props) {
     queryFn: () => fetchReactions(playIds),
     enabled: playIds.length > 0,
   });
+
+  const preferredPlatform = useQuery({
+    queryKey: ["preferredPlatform"],
+    queryFn: fetchMyPreferredPlatform,
+  });
+
+  const handleOpen = (track: { id: string; title: string; artist: string }) => {
+    void openTrack(track, preferredPlatform.data ?? "spotify").catch(() =>
+      Alert.alert("곡을 열 수 없어요", "잠시 후 다시 시도해주세요."),
+    );
+  };
 
   // Realtime: 변경 감지 시 관련 쿼리 무효화
   useEffect(() => {
@@ -97,6 +111,7 @@ export function RoomFeedScreen({ roomId, roomName }: Props) {
             reactions={item.playId ? (reactions.data?.[item.playId] ?? []) : []}
             onReact={(playId, emoji) => react.mutate({ playId, emoji })}
             onOpenChat={(playId) => setChatTarget(playId)}
+            onOpen={handleOpen}
           />
         )}
         ListEmptyComponent={

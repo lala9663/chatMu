@@ -8,9 +8,10 @@ interface Props {
   reactions: { emoji: string; count: number }[];
   onReact: (playId: string, emoji: string) => void;
   onOpenChat: (playId: string) => void;
+  onOpen: (track: { id: string; title: string; artist: string }) => void;
 }
 
-export function NowPlayingCard({ item, reactions, onReact, onOpenChat }: Props) {
+export function NowPlayingCard({ item, reactions, onReact, onOpenChat, onOpen }: Props) {
   return (
     <View style={styles.card}>
       <View style={styles.row}>
@@ -35,6 +36,17 @@ export function NowPlayingCard({ item, reactions, onReact, onOpenChat }: Props) 
             <Text style={styles.idle}>지금은 조용하네요</Text>
           )}
         </View>
+
+        {item.track && (
+          <Pressable
+            style={styles.openButton}
+            onPress={() =>
+              onOpen({ id: item.track!.id, title: item.track!.title, artist: item.track!.artist })
+            }
+          >
+            <Text style={styles.openButtonText}>🎧 내 플랫폼{"\n"}으로 열기</Text>
+          </Pressable>
+        )}
       </View>
 
       {item.playId && (
@@ -73,7 +85,7 @@ function formatDetectedAt(iso: string): string {
 
 const styles = StyleSheet.create({
   card: { backgroundColor: "#f9f9fa", borderRadius: 16, padding: 14, marginBottom: 10 },
-  row: { flexDirection: "row", gap: 12 },
+  row: { flexDirection: "row", gap: 12, alignItems: "center" },
   artwork: { width: 64, height: 64, borderRadius: 8 },
   artworkPlaceholder: { backgroundColor: "#e4e4e7", alignItems: "center", justifyContent: "center" },
   artworkPlaceholderText: { fontSize: 24, opacity: 0.4 },
@@ -83,6 +95,14 @@ const styles = StyleSheet.create({
   artist: { fontSize: 13, opacity: 0.7 },
   detectedAt: { fontSize: 11, opacity: 0.4, marginTop: 2 },
   idle: { fontSize: 13, opacity: 0.4, marginTop: 6 },
+  openButton: {
+    backgroundColor: "#191919",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    alignSelf: "center",
+  },
+  openButtonText: { color: "#fff", fontWeight: "600", fontSize: 12, textAlign: "center" },
   actions: { flexDirection: "row", gap: 6, marginTop: 10 },
   emojiButton: {
     backgroundColor: "#fff",

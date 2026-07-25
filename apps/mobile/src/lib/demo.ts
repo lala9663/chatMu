@@ -78,3 +78,16 @@ export const demoReactions: Record<string, { emoji: string; count: number }[]> =
   ],
   p2: [{ emoji: "👀", count: 1 }],
 };
+
+/** 데모용 곡별 플랫폼 링크. "내 플랫폼으로 열기" UI 흐름을 백엔드 없이 확인 */
+export const demoTrackLinks: Record<string, Record<string, string>> = {
+  t1: {
+    spotify: "https://open.spotify.com/search/Supernova%20aespa",
+    youtube_music: "https://music.youtube.com/search?q=Supernova%20aespa",
+    apple_music: "https://music.apple.com/search?term=Supernova%20aespa",
+  },
+  t2: {
+    spotify: "https://open.spotify.com/search/Welcome%20to%20the%20Jungle",
+    youtube_music: "https://music.youtube.com/search?q=Welcome%20to%20the%20Jungle",
+  },
+};
